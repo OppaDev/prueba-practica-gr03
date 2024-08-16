@@ -19,5 +19,27 @@ services:
 
   autenticacion:
     build: ./autentificacion
+    container_name: autenticacion
     ports:
       - "8002:8000"
+
+  db:
+    image: postgres:13
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: mysecretpassword123
+      POSTGRES_DB: cms_db
+    ports:
+      - "5432:5432"
+
+  crud:
+    build: ./crud
+    container_name: crud
+    ports:
+      - "8003:8000"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://admin:mysecretpassword123@db:5432/cms_db
+

@@ -9,6 +9,9 @@ COPY requirements.txt .
 
 # Instala las dependencias
 RUN pip install --no-cache-dir -r requirements.txt
+# RUN alembic upgrade head
+
+
 
 # Copia el código fuente de la aplicación
 COPY . .
@@ -17,4 +20,4 @@ COPY . .
 EXPOSE 8001
 
 # Define el comando por defecto para ejecutar la aplicación
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8001"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
