@@ -45,3 +45,4 @@ Thumbs.db
 
 # firebase
 autentificacion/config/conf_firebase.json
+autentificacion/config/conf.json
