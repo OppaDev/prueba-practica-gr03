@@ -1,11 +1,11 @@
-# Microservicio de Blog
+# Microservicio CRUD de Productos
 
-Este proyecto es un microservicio para gestionar publicaciones de un blog utilizando FastAPI y PostgreSQL. A continuación se detalla la configuración, el proceso de instalación y el uso de este microservicio.
-
+Este microservicio permite gestionar productos en una tienda utilizando una arquitectura basada en microservicios. El servicio incluye operaciones para crear, leer, actualizar y eliminar (CRUD) productos, junto con la gestión de categorías y usuarios. El microservicio está desarrollado en FastAPI y utiliza PostgreSQL como base de datos, todo gestionado a través de contenedores Docker.
 ## Estructura del Proyecto
 
 La estructura del proyecto es la siguiente:
 
+´´´
 ├── app/
 │ ├── main.py
 │ ├── models.py
@@ -14,23 +14,51 @@ La estructura del proyecto es la siguiente:
 │ └── database.py
 ├── alembic.ini
 └── migrations/
+´´´
+
+
+## Archivos Principales
+
+1. **main.py**: Contiene la configuración de la aplicación FastAPI y las rutas para el CRUD de productos.
+
+2. **models.py**: Define los modelos de datos para productos, categorías y usuarios, utilizando SQLAlchemy.
+
+3. **schemas.py**: Define los esquemas Pydantic que se utilizan para validar y serializar los datos de entrada y salida.
+
+4.**crud.py**: Implementa las operaciones CRUD para interactuar con la base de datos.
+
+5.**database.py**: Configura la conexión a la base de datos PostgreSQL.
+
+6.**alembic.ini**: Archivo de configuración para Alembic, que gestiona las migraciones de la base de datos.
+
+7.**Dockerfile**: Define la imagen de Docker para el microservicio.
+
+
 
 
 
 ## Configuración del Entorno
 
-1. **Docker**: El proyecto utiliza Docker para la contenedorización. Asegúrate de tener Docker y Docker Compose instalados en tu sistema.
 
-2. **Variables de Entorno**: La configuración de la base de datos se maneja mediante la variable de entorno `DATABASE_URL` en el archivo `docker-compose.yml`.
+### Configuración de Docker
 
-## Archivos de Configuración
+Asegúrate de tener Docker y Docker Compose instalados. El archivo docker-compose.yml define dos servicios principales:
 
-### `docker-compose.yml`
+app: El servicio que ejecuta la aplicación FastAPI.
+db: El servicio que ejecuta la base de datos PostgreSQL.
 
-```yaml
+´´´
 version: '3.8'
 
 services:
+  app:
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - "8001:8000"
+    depends_on:
+      - db
   db:
     image: postgres:13
     environment:
@@ -39,67 +67,28 @@ services:
       POSTGRES_DB: cms_db
     ports:
       - "5432:5432"
+´´´
+## Migraciones de Base de Datos con Alembic
+Alembic se utiliza para gestionar las migraciones de la base de datos. Las migraciones permiten que los cambios en los modelos de datos se reflejen en la estructura de la base de datos.
 
-  app:
-    image: my-fastapi-app
-    build: .
-    environment:
-      DATABASE_URL: postgres://admin:mysecretpassword123@db:5432/cms_db
-    ports:
-      - "8000:8000"
-    depends_on:
-      - db
+### Crear una Migración
+Dentro del contenedor de la aplicación, ejecuta el siguiente comando para generar una migración automática basada en los modelos actuales:
 
+´´´
+docker-compose exec app alembic revision --autogenerate -m "Initial migration for products, categories, and users"
+´´´
+### Aplicar la Migración
+Aplica la migración para crear las tablas en la base de datos:
 
-Migraciones de Base de Datos
-Las migraciones se gestionan con Alembic. Para aplicar las migraciones a la base de datos, usa el siguiente comando:
-
+´´´
 docker-compose exec app alembic upgrade head
-
-Para verificar la estructura de la base de datos, puedes conectarte al contenedor de PostgreSQL y revisar las tablas:
-
-docker-compose exec db psql -U admin -d cms_db
-
-Desarrollo
-Para desarrollar el proyecto, accede al contenedor de la aplicación:
-
-docker-compose exec app sh
-
-Navega al directorio de migraciones y abre los archivos de migración con vi o cualquier editor disponible:
-
-cd migrations/versions
-vi 176bf6dc8c8f_initial_migration.py
+´´´
+### Tomar en consideracion 
+Se debe ejectuar lo siguiente antes de ejecutar
 
 
-Ejemplo de Solicitud POST
-Puedes hacer solicitudes POST a la API utilizando herramientas como Thunder Client. Aquí tienes un ejemplo de solicitud para crear una nueva publicación:
-
-URL: http://localhost:8000/posts/
-
-Método: POST
-
-Cuerpo de la Solicitud:
-
-
-{
-  "title": "string",
-  "content": "string"
-}
-
-
-Respuesta Esperada:
-
-{
-  "title": "string",
-  "content": "string",
-  "id": 0
-}
-
-
-
-Notas Adicionales
-__pycache__: Carpeta generada automáticamente por Python para almacenar archivos de bytecode compilado.
-Archivos de Migración: Se encuentran en el directorio migrations/versions y se generan automáticamente con Alembic.
-Para cualquier pregunta o problema, por favor, consulta la documentación oficial de FastAPI, PostgreSQL y Alembic.
+´´´
+export PYTHONPATH=/app
+´´´
 
 
