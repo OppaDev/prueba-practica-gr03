@@ -9,7 +9,7 @@ Este proyecto es un microservicio para gestionar un crud de productos de coffes 
 
 ## Estructura del Proyecto
 ```
-practica-practica-gr03
+Microservicios
 │
 ├──autentificacion/
 │    ├── .dockerignore
@@ -52,9 +52,12 @@ practica-practica-gr03
 
 ## Comandos de Ejecucion
 
-Usa el siguiente comando para lanzar el la aplicacion de microservicio:
+Usa el siguiente comando para lanzar la aplicacion de microservicios:
 
 ### Para usar el microservicio 
 ```
 docker-compose up --build -d
 ```
+# Nota 
+
+Para una correcta ejecucion y configuracion visitar los archivos *README.md* de cada Microservicio
