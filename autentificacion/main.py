@@ -5,7 +5,9 @@ import firebase_admin
 from firebase_admin import credentials, auth
 from typing import Optional
 import logging
-import requests
+import httpx
+import os
+import json
 
 app = FastAPI()
 
@@ -18,6 +20,12 @@ cred = credentials.Certificate('config/conf_firebase.json')
 firebase_admin.initialize_app(cred)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='login')
+
+# Clave de API de Firebase (asegúrate de establecer esta variable de entorno)
+with open("config/conf.json") as config_file:
+    config = json.load(config_file)
+    firebase_api_key = config.get("firebase_api_key")
+
 
 class User(BaseModel):
     email: EmailStr
@@ -32,6 +40,20 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     try:
         decoded_token = auth.verify_id_token(token)
         return decoded_token
+    except auth.InvalidIdTokenError:
+        logger.error("Token ID inválido.")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='Token ID inválido',
+            headers={'WWW-Authenticate': 'Bearer'},
+        )
+    except auth.ExpiredIdTokenError:
+        logger.error("Token ID ha expirado.")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='Token ID ha expirado',
+            headers={'WWW-Authenticate': 'Bearer'},
+        )
     except Exception as e:
         logger.error(f"Error verifying token: {str(e)}")
         raise HTTPException(
@@ -75,28 +97,28 @@ async def register(user: User):
 @app.post('/login', response_model=Token)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     try:
-        user = auth.get_user_by_email(form_data.username)
-        # Nota: Aquí deberías verificar la contraseña, pero Firebase Admin SDK no lo permite directamente
-        # En un entorno de producción, considera usar Firebase Authentication REST API para la verificación de contraseñas
-        
-        # Crear un token personalizado
-        custom_token = auth.create_custom_token(user.uid)
-        
-        # Intercambiar el token personalizado por un token de ID
-        firebase_api_key = "AIzaSyAoEW1lSkpnOO2DE2K8nlAohIXIG5-jtdg"  # Necesitas obtener esto de tu configuración de Firebase
-        response = requests.post(
-            f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key={firebase_api_key}",
-            json={"token": custom_token.decode(), "returnSecureToken": True}
-        )
-        
-        id_token = response.json()['idToken']
-        
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={firebase_api_key}",
+                json={"email": form_data.username, "password": form_data.password, "returnSecureToken": True}
+            )
+
+        response_data = response.json()
+        if response.status_code != 200:
+            logger.error(f"Login failed: {response_data}")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail='Usuario o contraseña incorrectos',
+            )
+
+        id_token = response_data['idToken']
+
         return {"access_token": id_token, "token_type": "bearer"}
-    except auth.UserNotFoundError:
+    except httpx.RequestError as e:
+        logger.error(f"Error in login: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail='El usuario no existe',
-            headers={'WWW-Authenticate': 'Bearer'},
+            detail='Error en el servidor de autenticación',
         )
     except Exception as e:
         logger.error(f"Error in login: {str(e)}")
@@ -127,6 +149,3 @@ async def startup_event():
     for route in app.routes:
         logger.info(f"  {route.methods} {route.path}")
 
-@app.get("/test")
-async def test_route():
-    return {"message": "Test route works!"}
