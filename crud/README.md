@@ -87,7 +87,7 @@ docker-compose exec app alembic upgrade head
 ```
 
 ### Tomar en consideracion 
-Se debe ejectuar lo siguiente antes de ejecutar
+Se debe ejectuar lo siguiente antes de hacer la migracion
 
 
 ```
