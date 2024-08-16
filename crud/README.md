@@ -5,7 +5,7 @@ Este microservicio permite gestionar productos en una tienda utilizando una arqu
 
 La estructura del proyecto es la siguiente:
 
-´´´
+```
 ├── app/
 │ ├── main.py
 │ ├── models.py
@@ -14,7 +14,7 @@ La estructura del proyecto es la siguiente:
 │ └── database.py
 ├── alembic.ini
 └── migrations/
-´´´
+```
 
 
 ## Archivos Principales
@@ -25,13 +25,13 @@ La estructura del proyecto es la siguiente:
 
 3. **schemas.py**: Define los esquemas Pydantic que se utilizan para validar y serializar los datos de entrada y salida.
 
-4.**crud.py**: Implementa las operaciones CRUD para interactuar con la base de datos.
+4. **crud.py**: Implementa las operaciones CRUD para interactuar con la base de datos.
 
-5.**database.py**: Configura la conexión a la base de datos PostgreSQL.
+5. **database.py**: Configura la conexión a la base de datos PostgreSQL.
 
-6.**alembic.ini**: Archivo de configuración para Alembic, que gestiona las migraciones de la base de datos.
+6. **alembic.ini**: Archivo de configuración para Alembic, que gestiona las migraciones de la base de datos.
 
-7.**Dockerfile**: Define la imagen de Docker para el microservicio.
+7. **Dockerfile**: Define la imagen de Docker para el microservicio.
 
 
 
@@ -47,7 +47,7 @@ Asegúrate de tener Docker y Docker Compose instalados. El archivo docker-compos
 app: El servicio que ejecuta la aplicación FastAPI.
 db: El servicio que ejecuta la base de datos PostgreSQL.
 
-´´´
+```
 version: '3.8'
 
 services:
@@ -67,28 +67,31 @@ services:
       POSTGRES_DB: cms_db
     ports:
       - "5432:5432"
-´´´
+```
+
 ## Migraciones de Base de Datos con Alembic
 Alembic se utiliza para gestionar las migraciones de la base de datos. Las migraciones permiten que los cambios en los modelos de datos se reflejen en la estructura de la base de datos.
 
 ### Crear una Migración
 Dentro del contenedor de la aplicación, ejecuta el siguiente comando para generar una migración automática basada en los modelos actuales:
 
-´´´
+```
 docker-compose exec app alembic revision --autogenerate -m "Initial migration for products, categories, and users"
-´´´
+```
+
 ### Aplicar la Migración
 Aplica la migración para crear las tablas en la base de datos:
 
-´´´
+```
 docker-compose exec app alembic upgrade head
-´´´
+```
+
 ### Tomar en consideracion 
 Se debe ejectuar lo siguiente antes de ejecutar
 
 
-´´´
+```
 export PYTHONPATH=/app
-´´´
+```
 
 
