@@ -1,0 +1,14 @@
+_format_version: "2.1"
+_transform: true
+
+services:
+  - name: autenticacion
+    url: http://autenticacion:8000
+    routes:
+      - name: autenticacion-route
+        paths:
+          - /grupo03/auth
+        strip_path: true
+        methods:
+          - POST
+          - GET
