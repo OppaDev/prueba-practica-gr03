@@ -1,0 +1,25 @@
+# Ignorar archivos de Python cacheados
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignorar configuraciones de entorno virtual
+venv/
+*.env
+
+# Ignorar archivos de configuración del sistema operativo
+.DS_Store
+
+# Ignorar archivos de control de versiones
+.git/
+.gitignore
+
+# Ignorar archivos de desarrollo local
+.idea/
+.vscode/
+*.log
+
+# Ignorar archivos relacionados con Docker
+Dockerfile
+docker-compose.yml
+
