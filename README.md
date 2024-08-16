@@ -46,12 +46,15 @@ practica-practica-gr03
 ├── docker-compose.yml
 ├── kong.yml
 ```
-## Comandos de Ejecucion
-
 ## Requistos
 
+- Docker
+
+## Comandos de Ejecucion
+
+Usa el siguiente comando para lanzar el la aplicacion de microservicio:
 
 ### Para usar el microservicio 
-bash```
+```
 docker-compose up --build -d
 ```
