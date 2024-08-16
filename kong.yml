@@ -1,0 +1,37 @@
+_format_version: "2.1"
+_transform: true
+
+services:
+  - name: autenticacion
+    url: http://autenticacion:8000
+    routes:
+      - name: autenticacion-route
+        paths:
+          - /grupo03/auth
+        strip_path: true
+        methods:
+          - POST
+          - GET
+
+  - name: crud
+    url: http://crud:8000
+    routes:
+      - name: crud-route
+        paths:
+          - /grupo03/crud
+        strip_path: true
+        methods:
+          - POST
+          - GET
+          - PUT
+          - DELETE
+
+  - name: coffee
+    url: https://coffee.alexflipnote.dev
+    routes:
+      - name: coffee-route
+        paths:
+          - /grupo03/coffee/random
+        strip_path: true
+        methods:
+          - GET

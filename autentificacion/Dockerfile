@@ -1,20 +1,22 @@
-# Usar una imagen oficial de Python como imagen base
 FROM python:3.12-slim
 
-# Establecer el directorio de trabajo dentro del contenedor
+# Crear un usuario no root
+RUN adduser --disabled-password --gecos '' appuser
+
 WORKDIR /app
 
-# Copiar los archivos de requerimientos y el código de la aplicación
 COPY requirements.txt .
-
-# Instalar las dependencias necesarias
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copiar el código fuente de la aplicación en el directorio de trabajo
 COPY . .
 
-# Exponer el puerto en el que Uvicorn correrá
+# Cambiar la propiedad de los archivos de la aplicación al usuario no root
+RUN chown -R appuser:appuser /app
+
+# Cambiar al usuario no root
+USER appuser
+
 EXPOSE 8000
 
-# Comando para correr la aplicación usando Uvicorn
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+# Quitar --reload para producción
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
